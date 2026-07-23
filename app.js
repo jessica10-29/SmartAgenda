@@ -168,7 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const documentTitle = document.getElementById('documentTitle');
     const documentDownloadLink = document.getElementById('downloadDocumentLink');
     const signedDownloadLink = document.getElementById('downloadSignedDocument');
-    const documentSignatureSelect = document.getElementById('documentSignatureSelect');
     const documentSignatureCanvas = document.getElementById('documentSignatureCanvas');
     const documentSignaturePlaceholder = document.getElementById('documentSignaturePlaceholder');
     let activeDocument = null;
@@ -275,19 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    documentSignatureSelect?.addEventListener('change', () => {
-        if (documentSignatureSelect.value) {
-            documentSignaturePlaceholder?.classList.add('hidden');
-            showToast('Firma guardada seleccionada.', 'info');
-        } else if (!documentHasInk) {
-            documentSignaturePlaceholder?.classList.remove('hidden');
-        }
-    });
-
-    const signatureForDocument = () => {
-        if (documentSignatureSelect?.value) return documentSignatureSelect.value;
-        return documentHasInk ? documentSignatureCanvas.toDataURL('image/png') : '';
-    };
+    const signatureForDocument = () => documentHasInk ? documentSignatureCanvas.toDataURL('image/png') : '';
 
     const saveSignedCopy = async (blob, fileName, mime) => {
         const formData = new FormData();
@@ -351,35 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
             button.textContent = 'Firmar y guardar copia';
         }
     });
-
-    const canvas = document.getElementById('signatureCanvas');
-    const signatureForm = document.getElementById('signatureForm');
-    const signaturePlaceholder = document.getElementById('signaturePlaceholder');
-    let drawing = false;
-    let hasInk = false;
-    const context = canvas?.getContext('2d');
-    if (canvas && context) {
-        context.lineWidth = 2.5;
-        context.lineCap = 'round';
-        context.strokeStyle = '#172b4d';
-        const coordinates = (event) => {
-            const point = event.touches?.[0] || event;
-            const bounds = canvas.getBoundingClientRect();
-            return { x: (point.clientX - bounds.left) * (canvas.width / bounds.width), y: (point.clientY - bounds.top) * (canvas.height / bounds.height) };
-        };
-        const start = (event) => { event.preventDefault(); drawing = true; hasInk = true; signaturePlaceholder?.classList.add('hidden'); const point = coordinates(event); context.beginPath(); context.moveTo(point.x, point.y); };
-        const move = (event) => { if (!drawing) return; event.preventDefault(); const point = coordinates(event); context.lineTo(point.x, point.y); context.stroke(); };
-        const stop = () => { drawing = false; };
-        canvas.addEventListener('pointerdown', start);
-        canvas.addEventListener('pointermove', move);
-        canvas.addEventListener('pointerup', stop);
-        canvas.addEventListener('pointerleave', stop);
-        document.getElementById('clearSignature')?.addEventListener('click', () => { context.clearRect(0, 0, canvas.width, canvas.height); hasInk = false; signaturePlaceholder?.classList.remove('hidden'); });
-        signatureForm?.addEventListener('submit', (event) => {
-            if (!hasInk) { event.preventDefault(); showToast('Dibuja tu firma antes de guardarla.', 'warning'); return; }
-            document.getElementById('signatureData').value = canvas.toDataURL('image/png');
-        });
-    }
 
     const corrections = { 'reunion': 'reunión', 'administracion': 'administración', 'documentacion': 'documentación', 'tambien': 'también', 'informacion': 'información', 'programacion': 'programación', 'contraseña': 'contraseña' };
     document.querySelectorAll('input[type="text"], textarea').forEach((field) => {

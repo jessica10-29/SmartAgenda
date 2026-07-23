@@ -5,6 +5,7 @@ if (!empty($_SESSION['id'])) {
     redirect('dashboard.php');
 }
 
+$lang = current_language();
 $error = '';
 $notice = take_flash();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -36,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ingresar · SmartAgenda</title>
+    <title><?= e(translate('auth.title_login')) ?></title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="auth-page">
@@ -52,17 +53,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </section>
         <section class="auth-card">
             <div class="mobile-brand"><span class="brand-mark">SA</span><strong>SmartAgenda</strong></div>
-            <p class="eyebrow">Bienvenido de nuevo</p>
-            <h2>Iniciar sesión</h2>
+            <div class="auth-topbar"><span class="eyebrow"><?= e(translate('auth.welcome_back')) ?></span><select class="lang-select" onchange="const url=new URL(window.location.href); url.searchParams.set('lang', this.value); window.location.href=url.toString();"><option value="es" <?= $lang === 'es' ? 'selected' : '' ?>>Español</option><option value="en" <?= $lang === 'en' ? 'selected' : '' ?>>English</option></select></div>
+            <h2><?= e(translate('auth.sign_in')) ?></h2>
             <?php if ($notice): ?><div class="alert alert-<?= e($notice['type']) ?>"><?= e($notice['message']) ?></div><?php endif; ?>
             <?php if ($error): ?><div class="alert alert-error"><?= e($error) ?></div><?php endif; ?>
             <form method="post" class="stack-form" novalidate>
                 <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
-                <label>Correo electrónico<input type="email" name="correo" autocomplete="email" placeholder="tu@correo.com" required></label>
-                <label>Contraseña<input type="password" name="password" autocomplete="current-password" placeholder="Tu contraseña" required></label>
-                <button class="btn btn-primary btn-block" type="submit">Entrar a mi agenda <span>→</span></button>
+                <label><?= e(translate('auth.email')) ?><input type="email" name="correo" autocomplete="email" placeholder="tu@correo.com" required></label>
+                <label><?= e(translate('auth.password')) ?><input type="password" name="password" autocomplete="current-password" placeholder="Tu contraseña" required></label>
+                <button class="btn btn-primary btn-block" type="submit"><?= e(translate('auth.login_button')) ?> <span>→</span></button>
             </form>
-            <p class="auth-footer">¿Aún no tienes cuenta? <a href="registro.php">Crear cuenta gratis</a></p>
+            <p class="auth-footer"><?= e(translate('auth.no_account')) ?> <a href="registro.php"><?= e(translate('auth.create_free')) ?></a></p>
         </section>
     </main>
 </body>
